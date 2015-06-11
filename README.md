@@ -8,46 +8,41 @@
 ## ビルド・実行に必要なもの
 
 * USBカメラ2台（同機種が望ましい）
-* [cvImagePipeline](https://github.com/takamin/cvImagePipeline)
 * OpenCV 2.4
 * cmake 2.8
+* [cvImagePipeline](https://github.com/takamin/cvImagePipeline) (次項参照)
+
+## cvImagePipeline
+
+OpenCVを利用した画像処理ライブラリ [cvImagePipeline](https://github.com/takamin/cvImagePipeline)
+を使用しています。
+
+このリポジトリに Gitサブモジュールとして追加していますので、このリポジトリを clone したのち、
+`git submodule update cvImagePipeline` で更新してください。
+
 
 ## ビルド方法
 
 ビルドはcmakeで行います。
-
-1. cvImagePipelineのビルドと出力ファイルの配置
-2. cmakeでビルド
-
-### cvImagePipelineの出力ファイルの配置
-
-(以下、Windowsの場合の説明です)
-
-cvImagePipelineのRelease版の出力ファイルやヘッダファイルを以下の用に配置してください。
-また、dllを配置したフォルダにPATHを通しておいてください。
-
-```
-C:/cvImagePipeline/
- +- include/
- |   +- cvImagePipeline.h
- |   |  ...
- |   |  ...
- |   +- ...
- +- cvImagePipeline.dll
- +- cvImagePipeline.lib
-```
-
-### cmakeでビルド
-
-Windowsなら、以下のような感じでソリューションファイルが出来上がります。
+リポジトリのルートディレクトリで以下を実行。
 
 ```
 mkdir build
 cd build
-cmake -D OpenCV_DIR="C:/opencv" ..
+cmake ..
 ```
 
-Visual C++ でソリューションを開いて、__Release版でビルド__してください。Debug版では動作しません。
+## 出力フォルダ
+
+Windowsの場合、cmakeが終了した後、出力されたソリューションファイルを Visual C++ で開き、
+__Release版でINSTALLターゲットをビルド__してください。
+おそらくDebug版では動作しません。
+
+実行モジュールは、
+プログラムフォルダ
+（`C:\\Program Files` または、
+`C:\\Program Files (x86)`）の
+`StereoBlockMatch`へ出力されています。
 
 ## 動作確認した環境
 

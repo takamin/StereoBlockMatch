@@ -1,0 +1,3 @@
+[submodule "cvImagePipeline"]
+	path = cvImagePipeline
+	url = https://github.com/takamin/cvImagePipeline.git
