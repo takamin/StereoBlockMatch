@@ -1,3 +1,6 @@
 [submodule "cvImagePipeline"]
 	path = cvImagePipeline
 	url = https://github.com/takamin/cvImagePipeline.git
+[submodule "win-c"]
+	path = win-c
+	url = https://github.com/takamin/win-c.git

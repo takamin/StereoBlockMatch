@@ -1,6 +1,8 @@
 #include <iostream>
+#include <sstream>
 #include <opencv2/opencv.hpp>
 #include <cvImagePipeline.h>
+#include "getopt.h"
 
 using namespace cvImagePipeline::Filter;
 class StereoBlockMatcher : public ImageProcessor {
@@ -55,11 +57,36 @@ public:
 IMPLEMENT_CVFILTER(StereoBlockMatcher);
 IMPLEMENT_CVFILTER(DisparityVisualizer);
 
+static int toInt(char const* s, int dfl) {
+    int n = dfl;
+    if(s) {
+        std::stringstream ss(s);
+        ss >> n;
+    }
+    return n;
+}
 int main(int argc, char* argv[]) {
+    char const* optstring = "L:R:";
+    int opt = 0;
+    char const* optR = 0;
+    char const* optL = 0;
+    while((opt = getopt(argc, argv, optstring)) != -1) {
+        switch(opt) {
+            case 'R':
+                optR = optarg;
+                break;
+            case 'L':
+                optL = optarg;
+                break;
+        }
+    }
+    int deviceIndexR = toInt(optR, 1);
+    int deviceIndexL = toInt(optL, 2);
+
     cvImagePipeline::Filter::ImgProcSet proc;
     
-    proc.add("VideoCapture", "capR", false).property("deviceIndex", 1);
-    proc.add("VideoCapture", "capL", false).property("deviceIndex", 2);
+    proc.add("VideoCapture", "capR", false).property("deviceIndex", deviceIndexR);
+    proc.add("VideoCapture", "capL", false).property("deviceIndex", deviceIndexL);
     proc.add("ColorConverter", "gryR", false).property("cvtCode", CV_BGR2GRAY);
     proc.add("ColorConverter", "gryL", false).property("cvtCode", CV_BGR2GRAY);
     proc.add("StereoBlockMatcher", "stereo", false);
