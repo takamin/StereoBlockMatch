@@ -5,12 +5,20 @@
 
 ステレオマッチングには OpenCV の StereoSGBM を使用。
 
+opencvのキャプチャーデバイスインデックスは、既定では、右のカメラが1、左のカメラが2です。それぞれ、-R、-Lのオプションで変更できます。
+
+以下の例では、デバイスインデックスを、右を2、左を2に変更しています。
+
+`$ ./StereoBlockMatch -R2 -L1`
+
+
 ## ビルド・実行に必要なもの
 
 * USBカメラ2台（同機種が望ましい）
 * OpenCV 2.4
-* cmake 2.8
+* cmake 2.8 / 3.3
 * [cvImagePipeline](https://github.com/takamin/cvImagePipeline) (次項参照)
+* opencv 2.4 ※cmakeのfind\_packageで検索されます。
 
 ## cvImagePipeline
 
@@ -50,6 +58,7 @@ __Release版でINSTALLターゲットをビルド__してください。
 
 * Windows 7 (32bit) SP1
 * Microsoft Visual C++ 2010 Express
+* Microsoft Visual Studio Community 2015 Visual C++ 2015
 * 百均で買った2台のUSBカメラ
 * OpenCV 2.4.10
 * cvImagePipeline 1.0
