@@ -1,23 +1,15 @@
 #include <iostream>
-#include <sstream>
 #include <opencv2/opencv.hpp>
 #include <cvImagePipeline.h>
 #include "StereoBlockMatcher.h"
 #include "DisparityVisualizer.h"
 #include "getopt.h"
+#include "util.h"
 
 using namespace cvImagePipeline::Filter;
 IMPLEMENT_CVFILTER(StereoBlockMatcher);
 IMPLEMENT_CVFILTER(DisparityVisualizer);
 
-static int toInt(char const* s, int dfl) {
-    int n = dfl;
-    if(s) {
-        std::stringstream ss(s);
-        ss >> n;
-    }
-    return n;
-}
 int main(int argc, char* argv[]) {
     char const* optstring = "L:R:";
     int opt = 0;
