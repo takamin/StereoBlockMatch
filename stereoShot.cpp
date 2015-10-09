@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <vector>
 #include <opencv2/opencv.hpp>
@@ -110,14 +111,12 @@ int main(int argc, char* argv[]) {
             const cv::Mat& gryL = proc["gryL"].getOutputMat();
             std::stringstream fnR;
             std::stringstream fnL;
-            fnR << "cal_" << photo_number << "_R.jpg";
-            fnL << "cal_" << photo_number << "_L.jpg";
+            fnR << "cal_" << std::setw(3) << std::setfill('0') << photo_number << "_R.jpg";
+            fnL << "cal_" << std::setw(3) << std::setfill('0') << photo_number << "_L.jpg";
             cv::imwrite(fnR.str(), gryR, imwrite_params);
             cv::imwrite(fnL.str(), gryL, imwrite_params);
             photo_number++;
-            std::cerr << "save right image to " << fnR.str()
-                << " and left one to " << fnL.str() << "."
-                << std::endl;
+            std::cerr << "image: " << fnL.str() << " / " << fnR.str() << std::endl;
         }
     }
     return 0;
