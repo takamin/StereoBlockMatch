@@ -14,7 +14,7 @@ class DrawChessboardCorners : public ImageProcessor {
 public:
     DECLARE_CVFILTER;
     DrawChessboardCorners()
-        : patternSize(7, 7),
+        : patternSize(10, 8),
         flags(
                 CV_CALIB_CB_ADAPTIVE_THRESH |
                 CV_CALIB_CB_NORMALIZE_IMAGE |
@@ -40,8 +40,6 @@ public:
                     cv::TermCriteria(
                         CV_TERMCRIT_EPS + CV_TERMCRIT_ITER,
                         30, 0.1));
-            /***********************************************
-            ***********************************************/
             cv::drawChessboardCorners(
                     out, patternSize,
                     cv::Mat(corners),
