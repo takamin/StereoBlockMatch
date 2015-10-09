@@ -94,11 +94,9 @@ int main(int argc, char* argv[]) {
     proc.add("ImageWindow", "wnd")
         .property("windowName", "stereoShot");
 
-    std::cerr << "[SPC] to shoot, [Shift]+[Q] to quit." << std::endl;
     int photo_number = 0;
-    std::vector<int> imwrite_params;
-    imwrite_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-    imwrite_params.push_back(100);
+
+    std::cerr << "[SPC] to shoot, [Shift]+[Q] to quit." << std::endl;
 
     while(true) {
         proc.execute();
@@ -106,17 +104,10 @@ int main(int argc, char* argv[]) {
         if(c == 'Q') {
             break;
         } else if(c == ' ') {
-            // save L-R images to file.
-            const cv::Mat& gryR = proc["gryR"].getOutputMat();
-            const cv::Mat& gryL = proc["gryL"].getOutputMat();
-            std::stringstream fnR;
-            std::stringstream fnL;
-            fnR << "cal_" << std::setw(3) << std::setfill('0') << photo_number << "_R.jpg";
-            fnL << "cal_" << std::setw(3) << std::setfill('0') << photo_number << "_L.jpg";
-            cv::imwrite(fnR.str(), gryR, imwrite_params);
-            cv::imwrite(fnL.str(), gryL, imwrite_params);
-            photo_number++;
-            std::cerr << "image: " << fnL.str() << " / " << fnR.str() << std::endl;
+            saveStereoImages(
+                    proc["gryR"].getOutputMat(),
+                    proc["gryL"].getOutputMat(),
+                    "cal", photo_number++);
         }
     }
     return 0;
