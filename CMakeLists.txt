@@ -13,7 +13,8 @@ include_directories(
 add_executable(
     StereoBlockMatch
     StereoBlockMatch.cpp
-    util.cpp )
+    cal.cpp
+    util.cpp)
 
 target_link_libraries(
     StereoBlockMatch

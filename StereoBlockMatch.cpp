@@ -4,6 +4,7 @@
 #include "StereoBlockMatcher.h"
 #include "DisparityVisualizer.h"
 #include "getopt.h"
+#include "cal.h"
 #include "util.h"
 
 using namespace cvImagePipeline::Filter;
@@ -27,6 +28,9 @@ int main(int argc, char* argv[]) {
     }
     int deviceIndexR = toInt(optR, 1);
     int deviceIndexL = toInt(optL, 2);
+
+    StereoCalibrationInfo cal;
+    cal.FromImages("cal/cal");
 
     cvImagePipeline::Filter::ImgProcSet proc;
     

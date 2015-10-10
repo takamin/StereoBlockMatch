@@ -44,3 +44,19 @@ void saveStereoImages(
     cv::imwrite(fnL, imageL, imwrite_params);
     std::cerr << "save image: " << fnL << " / " << fnR << std::endl;
 }
+bool loadStereoImages(
+        cv::Mat& imageR, cv::Mat& imageL,
+        char const* prefix, int seqno)
+{
+    std::string fnR, fnL;
+    createCalImageFilenames(fnR, fnL, prefix, seqno);
+    imageR = cv::imread(fnR);
+    imageL = cv::imread(fnL);
+    if(!imageR.empty()) {
+        std::cerr << "load image: " << fnR << std::endl;
+    }
+    if(!imageL.empty()) {
+        std::cerr << "load image: " << fnL << std::endl;
+    }
+    return !imageR.empty() && !imageL.empty();
+}
