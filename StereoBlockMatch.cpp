@@ -12,10 +12,11 @@ IMPLEMENT_CVFILTER(StereoBlockMatcher);
 IMPLEMENT_CVFILTER(DisparityVisualizer);
 
 int main(int argc, char* argv[]) {
-    char const* optstring = "L:R:";
+    char const* optstring = "L:R:C:";
     int opt = 0;
     char const* optR = 0;
     char const* optL = 0;
+    char const* calPrefix = 0;
     while((opt = getopt(argc, argv, optstring)) != -1) {
         switch(opt) {
             case 'R':
@@ -24,13 +25,18 @@ int main(int argc, char* argv[]) {
             case 'L':
                 optL = optarg;
                 break;
+            case 'C':
+                calPrefix = optarg;
+                break;
         }
     }
     int deviceIndexR = toInt(optR, 1);
     int deviceIndexL = toInt(optL, 2);
 
     StereoCalibrationInfo cal;
-    cal.FromImages("cal/cal");
+    if(calPrefix != 0) {
+        cal.FromImages(calPrefix);
+    }
 
     cvImagePipeline::Filter::ImgProcSet proc;
     

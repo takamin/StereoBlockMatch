@@ -50,10 +50,11 @@ public:
 };
 IMPLEMENT_CVFILTER(DrawChessboardCorners);
 int main(int argc, char* argv[]) {
-    char const* optstring = "L:R:";
+    char const* optstring = "L:R:C:";
     int opt = 0;
     char const* optR = 0;
     char const* optL = 0;
+    char const* calPrefix = "cal";
     while((opt = getopt(argc, argv, optstring)) != -1) {
         switch(opt) {
             case 'R':
@@ -61,6 +62,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'L':
                 optL = optarg;
+                break;
+            case 'C':
+                calPrefix = optarg;
                 break;
         }
     }
@@ -107,7 +111,7 @@ int main(int argc, char* argv[]) {
             saveStereoImages(
                     proc["gryR"].getOutputMat(),
                     proc["gryL"].getOutputMat(),
-                    "cal", photo_number++);
+                    calPrefix, photo_number++);
         }
     }
     return 0;
