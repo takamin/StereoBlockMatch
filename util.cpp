@@ -50,8 +50,8 @@ bool loadStereoImages(
 {
     std::string fnR, fnL;
     createCalImageFilenames(fnR, fnL, prefix, seqno);
-    imageR = cv::imread(fnR);
-    imageL = cv::imread(fnL);
+    imageR = cv::imread(fnR, 0);
+    imageL = cv::imread(fnL, 0);
     if(!imageR.empty()) {
         std::cerr << "load image: " << fnR << std::endl;
     }
