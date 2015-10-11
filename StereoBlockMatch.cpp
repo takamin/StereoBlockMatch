@@ -69,6 +69,9 @@ int main(int argc, char* argv[]) {
             >> proc["viewL"] >> proc["stereo"].input("left");
     }
     proc.add("DisparityVisualizer", "dis");
+    if(calPrefix != 0) {
+        proc["dis"].setInputMat("Q", cal.MapQ());
+    }
     proc.add("Convert", "cvtReal").property("rtype", CV_32FC1);
     proc.add("RunningAvg", "runavg").property("averageCount", 15);
     proc.add("Convert", "avg").property("rtype", CV_8UC1);

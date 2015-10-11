@@ -51,7 +51,7 @@ class StereoCalibrationInfo {
         const cv::Mat& MapRight2() const { return this->mapR2; }
         const cv::Mat& MapLeft1() const { return this->mapL1; }
         const cv::Mat& MapLeft2() const { return this->mapL2; }
-        const cv::Mat& CalMapL() const { return this->mapR1; }
+        const cv::Mat& MapQ() const { return this->Q; }
     private:
         void addImages(const cv::Mat& imageR, const cv::Mat& imageL);
     private:
