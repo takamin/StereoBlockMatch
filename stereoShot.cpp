@@ -28,7 +28,7 @@ public:
             return;
         }
         cv::Mat& out = refOutputMat();
-        out = in;
+        in.copyTo(out);
 
         std::vector<cv::Point2f> corners;
         bool patternFound = cv::findChessboardCorners(
