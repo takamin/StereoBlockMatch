@@ -153,9 +153,9 @@ void StereoCalibrationInfo::FromImages(char const* prefix)
 
         std::cerr << "*** result of stereoCalibrate:" << std::endl;
         double reprojectionError = cv::stereoCalibrate(r.ObjectPoints(),
-                this->r.ImagePoints(), this->l.ImagePoints(),
-                this->cameraMatrixR, this->distCoeffsR,
+                this->l.ImagePoints(), this->r.ImagePoints(),
                 this->cameraMatrixL, this->distCoeffsL,
+                this->cameraMatrixR, this->distCoeffsR,
                 this->r.ImageSize(),
                 this->R, this->T, this->E, this->F);
         std::cerr << "reprojection error: " << reprojectionError << std::endl;
@@ -169,8 +169,8 @@ void StereoCalibrationInfo::FromImages(char const* prefix)
         std::cerr << "F: " << std::endl << this->F << std::endl;
 
         cv::stereoRectify(
-                this->cameraMatrixR, this->distCoeffsR,
                 this->cameraMatrixL, this->distCoeffsL,
+                this->cameraMatrixR, this->distCoeffsR,
                 this->r.ImageSize(), this->R, this->T,
                 this->R1, this->R2, this->P1, this->P2, this->Q);
         std::cerr << "*** result of stereoRectify:" << std::endl;
@@ -181,8 +181,8 @@ void StereoCalibrationInfo::FromImages(char const* prefix)
         std::cerr << "Q: " << std::endl << this->Q << std::endl;
 
         cv::initUndistortRectifyMap(
-                this->cameraMatrixR, this->distCoeffsR, this->R1,
-                this->P1, this->r.ImageSize(), CV_32FC1,
+                this->cameraMatrixR, this->distCoeffsR, this->R2,
+                this->P2, this->r.ImageSize(), CV_32FC1,
                 this->mapR1, this->mapR2);
         std::cerr << "*** right result of initUndistortRectifyMap:" << std::endl;
         std::cerr << "mapR1.cols: " << this->mapR1.cols << std::endl;
@@ -191,8 +191,8 @@ void StereoCalibrationInfo::FromImages(char const* prefix)
         std::cerr << "mapR2.rows: " << this->mapR2.rows << std::endl;
 
         cv::initUndistortRectifyMap(
-                this->cameraMatrixL, this->distCoeffsL, this->R2,
-                this->P2, this->l.ImageSize(), CV_32FC1,
+                this->cameraMatrixL, this->distCoeffsL, this->R1,
+                this->P1, this->l.ImageSize(), CV_32FC1,
                 this->mapL1, this->mapL2);
         std::cerr << "*** left result of initUndistortRectifyMap:" << std::endl;
         std::cerr << "mapL1.cols: " << this->mapL1.cols << std::endl;
