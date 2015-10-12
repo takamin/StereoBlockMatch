@@ -1,9 +1,11 @@
 #include <iostream>
+#include <sstream>
 #include <opencv2/opencv.hpp>
 #include <cvImagePipeline.h>
 #include "StereoBlockMatcher.h"
 #include "DisparityVisualizer.h"
 #include "Remapper.h"
+#include "TextOverlay.h"
 #include "getopt.h"
 #include "cal.h"
 #include "util.h"
@@ -13,12 +15,55 @@ IMPLEMENT_CVFILTER(StereoBlockMatcher);
 IMPLEMENT_CVFILTER(DisparityVisualizer);
 IMPLEMENT_CVFILTER(Remapper);
 
+struct EditParam {
+    int idchar;
+    char const* name;
+    int value;
+    int min_value;
+    int max_value;
+    int m;
+};
+struct EditParam paratbl[] {
+    {'m', "minDisparity", 3,0,16,1,},
+    {'n', "numDisparity", 16,16,512,16,},
+    {'w', "sadWindowSize", 3,1,25,1,},
+    {'d', "disp12maxDiff", 0,0,256,16,},
+    {'p', "prefilterCap", 0,0,256,2,},
+    {'u', "uniquenessRatio", 0,0,100,1,},
+    {'s', "speckleWindowSize", 0,0,200,50,},
+    {'r', "speckleRange", 0,0,256,16,},
+};
+static std::string createParamStr(int paraidx) {
+    std::stringstream ss;
+    ss << "StereoBlockMatch" << std::endl;
+    ss << "================" << std::endl;
+    ss << std::endl;
+    ss << " --- PARAMETERS ---" << std::endl;
+    for(int i = 0; i < sizeof(paratbl)/sizeof(paratbl[0]); i++) {
+        ss << (i == paraidx ? ">" : " ")
+            << "[" << (char)paratbl[i].idchar << "]:"
+            << paratbl[i].name << "=" << paratbl[i].value << std::endl;
+    }
+    ss << "----" << std::endl
+        << " [+] / [-]: change value" << std::endl
+        << " [SPC]: set value to Min or Max" << std::endl
+        << " [Q]: Quit" << std::endl;
+    return ss.str();
+}
 int main(int argc, char* argv[]) {
-    char const* optstring = "L:R:C:";
+    char const* optstring = "L:R:C:m:n:w:d:";
     int opt = 0;
     char const* optR = 0;
     char const* optL = 0;
     char const* calPrefix = 0;
+    int minDisparity = 3;
+    int numDisparity = 16;
+    int sadWindowSize = 3;
+    int disp12maxDiff = 0;
+    int prefilterCap = 0;
+    int uniquenessRatio = 0;
+    int speckleWindowSize = 0;
+    int speckleRange = 0;
     while((opt = getopt(argc, argv, optstring)) != -1) {
         switch(opt) {
             case 'R':
@@ -30,6 +75,14 @@ int main(int argc, char* argv[]) {
             case 'C':
                 calPrefix = optarg;
                 break;
+            case 'm': minDisparity = toInt(optarg, 3); break;
+            case 'n': numDisparity = toInt(optarg, 16); break;
+			case 'w': sadWindowSize = toInt(optarg, 3); break;
+			case 'd': disp12maxDiff = toInt(optarg, 0); break;
+			case 'p': prefilterCap = toInt(optarg, 0); break;
+			case 'u': uniquenessRatio = toInt(optarg, 0); break;
+			case 's': speckleWindowSize = toInt(optarg, 0); break;
+			case 'r': speckleRange = toInt(optarg, 0); break;
         }
     }
     int deviceIndexR = toInt(optR, 1);
@@ -56,7 +109,15 @@ int main(int argc, char* argv[]) {
     }
     proc.add("ImagePoint", "viewR", false);
     proc.add("ImagePoint", "viewL", false);
-    proc.add("StereoBlockMatcher", "stereo", false);
+    proc.add("StereoBlockMatcher", "stereo", false)
+        .property("minDisparity", minDisparity)
+        .property("numDisparity", numDisparity)
+        .property("sadWindowSize", sadWindowSize)
+        .property("disp12maxDiff", disp12maxDiff)
+        .property("prefilterCap", prefilterCap)
+        .property("uniquenessRatio", uniquenessRatio)
+        .property("speckleWindowSize", speckleWindowSize)
+        .property("speckleRange", speckleRange);
     if(calPrefix != 0) {
         proc["capR"] >> proc["gryR"] >> proc["remapR"]
              >> proc["viewR"] >> proc["stereo"].input("right");
@@ -84,13 +145,65 @@ int main(int argc, char* argv[]) {
     proc["dis"] >> proc["fig"].input("2");
     proc["avg"] >> proc["fig"].input("3");
     
+    TextOverlay textoverlay;
+    proc.add(textoverlay, "textoverlay");
     proc.add("ImageWindow", "wnd").property("windowName", "StereoBlockMatch");
     
+    int paraidx = -1;
+    for(int i = 0; i < sizeof(paratbl)/sizeof(paratbl[0]); i++) {
+        paratbl[i].value = toInt(
+                proc["stereo"].property(paratbl[i].name).getString().c_str(), 0);
+    }
+    textoverlay.setText(createParamStr(paraidx));
     while(true) {
         proc.execute();
         int c = cvWaitKey(1);
         if(c == 'Q') {
             break;
+        }
+        switch(c) {
+            case '+':
+                if(paraidx >= 0) {
+                    if(paratbl[paraidx].value < paratbl[paraidx].max_value) {
+                        paratbl[paraidx].value += paratbl[paraidx].m;
+                        proc["stereo"].property(
+                                paratbl[paraidx].name,
+                                paratbl[paraidx].value);
+                    }
+                    textoverlay.setText(createParamStr(paraidx));
+                }
+                break;
+            case '-':
+                if(paraidx >= 0) {
+                    if(paratbl[paraidx].value > paratbl[paraidx].min_value) {
+                        paratbl[paraidx].value -= paratbl[paraidx].m;
+                        proc["stereo"].property(
+                                paratbl[paraidx].name,
+                                paratbl[paraidx].value);
+                    }
+                    textoverlay.setText(createParamStr(paraidx));
+                }
+                break;
+            case ' ':
+                if(paraidx >= 0) {
+                    if(paratbl[paraidx].value == paratbl[paraidx].min_value) {
+                        paratbl[paraidx].value = paratbl[paraidx].max_value;
+                    } else {
+                        paratbl[paraidx].value = paratbl[paraidx].min_value;
+                    }
+                    proc["stereo"].property(paratbl[paraidx].name, paratbl[paraidx].value);
+                    textoverlay.setText(createParamStr(paraidx));
+                }
+                break;
+            default:
+                for(int i = 0; i < sizeof(paratbl)/sizeof(paratbl[0]); i++) {
+                    if(c == paratbl[i].idchar) {
+                        paraidx = i;
+                        textoverlay.setText(createParamStr(paraidx));
+                        break;
+                    }
+                }
+                break;
         }
     }
     return 0;
