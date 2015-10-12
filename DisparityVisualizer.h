@@ -20,7 +20,7 @@ public:
         out = cv::Mat::zeros(in.rows, in.cols, CV_8UC1);
         if(!Q.empty()) {
             cv::Mat _3dImage;
-            cv::reprojectImageTo3D(in, _3dImage, Q);
+            cv::reprojectImageTo3D(in, _3dImage, Q, true);
             std::vector<cv::Mat> planes;
             cv::split(_3dImage, planes);
             planes[2].copyTo(depth);
@@ -31,6 +31,9 @@ public:
                 for(int col = 0; col < depth.cols; col++) {
                     float value = *p;
                     p++;
+                    if(value >= 10000.0) {
+                        value = 0.0;
+                    }
                     if(value < min) { min = value; }
                     if(value > max) { max = value; }
                 }
