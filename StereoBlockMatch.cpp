@@ -51,11 +51,12 @@ static std::string createParamStr(int paraidx) {
     return ss.str();
 }
 int main(int argc, char* argv[]) {
-    char const* optstring = "L:R:C:m:n:w:d:";
+    char const* optstring = "L:R:C:W:H:m:n:w:d:p:u:s:r:";
     int opt = 0;
     char const* optR = 0;
     char const* optL = 0;
     char const* calPrefix = 0;
+    cv::Size chessboardGridSize(18, 18);//[mm]
     int minDisparity = 3;
     int numDisparity = 16;
     int sadWindowSize = 3;
@@ -75,6 +76,8 @@ int main(int argc, char* argv[]) {
             case 'C':
                 calPrefix = optarg;
                 break;
+            case 'W': chessboardGridSize.width = toInt(optarg, 18); break;
+            case 'H': chessboardGridSize.height = toInt(optarg, 18); break;
             case 'm': minDisparity = toInt(optarg, 3); break;
             case 'n': numDisparity = toInt(optarg, 16); break;
 			case 'w': sadWindowSize = toInt(optarg, 3); break;
@@ -88,7 +91,7 @@ int main(int argc, char* argv[]) {
     int deviceIndexR = toInt(optR, 1);
     int deviceIndexL = toInt(optL, 2);
 
-    StereoCalibrationInfo cal;
+    StereoCalibrationInfo cal(chessboardGridSize);
     if(calPrefix != 0) {
         cal.FromImages(calPrefix);
     }

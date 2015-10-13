@@ -3,16 +3,22 @@
 class ChessboardInfo {
     public:
         ChessboardInfo();
-        ChessboardInfo(const cv::Mat& image, const cv::Size& patternSize, int flags);
+        ChessboardInfo(
+                const cv::Mat& image,
+                const cv::Size& patternSize,
+                const cv::Size& gridSize,
+                int flags);
         const cv::Mat& Image() const { return image; }
         const cv::Size& PatternSize() const { return patternSize; }
         const std::vector<cv::Point2f>& Corners() const { return corners; }
+        const std::vector<cv::Point3f>& ObjectPoints() const { return objectPoints; }
         bool IsDetectionValid() const;
         ChessboardInfo& operator=(const ChessboardInfo& that);
     private:
         cv::Mat image;
         cv::Size patternSize;
         std::vector<cv::Point2f> corners;
+        std::vector<cv::Point3f> objectPoints;
 };
 class CalibrationInfo {
     public:
@@ -45,7 +51,7 @@ class CalibrationInfo {
 };
 class StereoCalibrationInfo {
     public:
-        StereoCalibrationInfo();
+        StereoCalibrationInfo(cv::Size chessboardGridSizeMM);
         void FromImages(char const* prefix);
         const cv::Mat& MapRight1() const { return this->mapR1; }
         const cv::Mat& MapRight2() const { return this->mapR2; }
@@ -56,6 +62,7 @@ class StereoCalibrationInfo {
         void addImages(const cv::Mat& imageR, const cv::Mat& imageL);
     private:
         cv::Size patternSize;
+        cv::Size gridSize;
         int calibrateFlag;
         CalibrationInfo r;
         CalibrationInfo l;

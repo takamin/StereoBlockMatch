@@ -15,6 +15,7 @@ ChessboardInfo::ChessboardInfo()
 ChessboardInfo::ChessboardInfo(
         const cv::Mat& image,
         const cv::Size& patternSize,
+        const cv::Size& gridSize,
         int flags)
 {
     this->image = image.clone();
@@ -30,12 +31,21 @@ ChessboardInfo::ChessboardInfo(
                     CV_TERMCRIT_EPS + CV_TERMCRIT_ITER,
                     30, 0.1));
     }
+    for(int row = 0; row < this->patternSize.height; row++) {
+        for(int col = 0; col < this->patternSize.width; col++) {
+            this->objectPoints.push_back(cv::Point3f(
+                        (float)col * gridSize.width,
+                        (float)row * gridSize.height,
+                        (float)0));
+        }
+    }
 }
 ChessboardInfo& ChessboardInfo::operator=(const ChessboardInfo& that)
 {
     this->image = that.image.clone();
     this->patternSize = that.patternSize;
     this->corners = that.corners;
+    this->objectPoints = that.objectPoints;
     return *this;
 }
 bool ChessboardInfo::IsDetectionValid() const
@@ -85,13 +95,7 @@ void CalibrationInfo::addChessboardInfo(const ChessboardInfo& chessboardInfo)
             && this->patternSize.height == chessboardInfo.PatternSize().height
             && this->patternSize.width == chessboardInfo.PatternSize().width)
         {
-            std::vector<cv::Point3f> objectPoint;
-            for(int row = 0; row < patternSize.height; row++) {
-                for(int col = 0; col < patternSize.width; col++) {
-                    objectPoint.push_back(cv::Point3f((float)col, (float)row, 0.f));
-                }
-            }
-            this->objectPoints.push_back(objectPoint);
+            this->objectPoints.push_back(chessboardInfo.ObjectPoints());
             ChessboardInfo* p = new ChessboardInfo();
             *p = chessboardInfo;
             imagePoints.push_back(p->Corners());
@@ -122,11 +126,12 @@ bool CalibrationInfo::calibrate()
 // class StereoCalibrationInfo
 //
 //
-StereoCalibrationInfo::StereoCalibrationInfo()
+StereoCalibrationInfo::StereoCalibrationInfo(cv::Size chessboardGridSizeMM)
     :
         cameraMatrixR(cv::Mat::zeros(3,3,CV_32F)),
         cameraMatrixL(cv::Mat::zeros(3,3,CV_32F)),
         patternSize(10, 8),
+        gridSize(chessboardGridSizeMM),
         calibrateFlag(
             CV_CALIB_CB_ADAPTIVE_THRESH |
             CV_CALIB_CB_NORMALIZE_IMAGE |
@@ -203,8 +208,8 @@ void StereoCalibrationInfo::FromImages(char const* prefix)
 }
 void StereoCalibrationInfo::addImages(const cv::Mat& imageR, const cv::Mat& imageL)
 {
-    ChessboardInfo cbR(imageR, patternSize, calibrateFlag);
-    ChessboardInfo cbL(imageL, patternSize, calibrateFlag);
+    ChessboardInfo cbR(imageR, patternSize, gridSize, calibrateFlag);
+    ChessboardInfo cbL(imageL, patternSize, gridSize, calibrateFlag);
     if(cbR.IsDetectionValid() && cbL.IsDetectionValid()) {
         r.addChessboardInfo(cbR);
         l.addChessboardInfo(cbL);
