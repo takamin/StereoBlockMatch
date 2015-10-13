@@ -2,7 +2,7 @@
 #include <cvImagePipeline.h>
 
 using namespace cvImagePipeline::Filter;
-class StereoBlockMatcher : public ImageProcessor {
+class StereoSGBM : public ImageProcessor {
     cv::StereoSGBM* stereo;
 public:
     TParam<int> minDisparity;
@@ -15,7 +15,7 @@ public:
     TParam<int> speckleRange;
 public:
     DECLARE_CVFILTER;
-    StereoBlockMatcher()
+    StereoSGBM()
         :
             stereo(0),
             minDisparity("minDisparity", 0),
@@ -39,10 +39,9 @@ public:
         defInputMat("left");
         undefInputMat("");
     }
-    ~StereoBlockMatcher()
+    ~StereoSGBM()
     {
-        delete stereo;
-        stereo = 0;
+        destroy();
     }
     void execute() {
         if(stereo == 0) {
@@ -53,10 +52,7 @@ public:
                 refOutputMat());
     }
     void onPropertyChange(Property& property) {
-        if(stereo) {
-            delete stereo;
-            stereo = 0;
-        }
+        destroy();
         create();
     }
 private:
@@ -67,5 +63,9 @@ private:
                 32 * sadWindowSize * sadWindowSize,
                 disp12maxDiff, prefilterCap, uniquenessRatio,
                 speckleWindowSize, speckleRange,false);
+    }
+    void destroy() {
+        delete stereo;
+        stereo = 0;
     }
 };

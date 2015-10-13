@@ -2,7 +2,8 @@
 #include <sstream>
 #include <opencv2/opencv.hpp>
 #include <cvImagePipeline.h>
-#include "StereoBlockMatcher.h"
+#include "StereoBM.h"
+#include "StereoSGBM.h"
 #include "DisparityVisualizer.h"
 #include "Remapper.h"
 #include "TextOverlay.h"
@@ -11,7 +12,8 @@
 #include "util.h"
 
 using namespace cvImagePipeline::Filter;
-IMPLEMENT_CVFILTER(StereoBlockMatcher);
+IMPLEMENT_CVFILTER(StereoBM);
+IMPLEMENT_CVFILTER(StereoSGBM);
 IMPLEMENT_CVFILTER(DisparityVisualizer);
 IMPLEMENT_CVFILTER(Remapper);
 
@@ -112,7 +114,7 @@ int main(int argc, char* argv[]) {
     }
     proc.add("ImagePoint", "viewR", false);
     proc.add("ImagePoint", "viewL", false);
-    proc.add("StereoBlockMatcher", "stereo", false)
+    proc.add("StereoSGBM", "stereo", false)
         .property("minDisparity", minDisparity)
         .property("numDisparity", numDisparity)
         .property("sadWindowSize", sadWindowSize)
