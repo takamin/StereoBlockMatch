@@ -24,18 +24,17 @@ public:
             std::vector<cv::Mat> planes;
             cv::split(_3dImage, planes);
             planes[2].copyTo(depth);
-            float min = 0;
-            float max = 0;
+            float min = 10000.0;
+            float max = 0.0;
             for(int row = 0; row < depth.rows; row++) {
                 float* p = (float*)(depth.data + depth.step * row);
                 for(int col = 0; col < depth.cols; col++) {
                     float value = *p;
                     p++;
-                    if(value >= 10000.0) {
-                        value = 0.0;
+                    if(value < 10000.0) {
+                        if(value < min) { min = value; }
+                        if(value > max) { max = value; }
                     }
-                    if(value < min) { min = value; }
-                    if(value > max) { max = value; }
                 }
             }
             for(int row = 0; row < depth.rows; row++) {
@@ -44,7 +43,10 @@ public:
                 for(int col = 0; col < depth.cols; col++) {
                     float value = *src;
                     src++;
-                    *dst = (unsigned char)(255.0 * (value - min) / (max - min));
+                    if(value > max) {
+                        value = max;
+                    }
+                    *dst = (unsigned char)(255.0 * (max - value) / (max - min));
                     dst++;
                 }
             }
