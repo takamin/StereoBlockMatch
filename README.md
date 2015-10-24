@@ -5,6 +5,8 @@
 
 ステレオマッチングには OpenCV の StereoSGBM を使用。
 
+[![StereoBlockMatch](http://cdn-ak.f.st-hatena.com/images/fotolife/t/takamints/20151013/20151013115218.png)](http://takamints.hatenablog.jp/entry/result-of-opencv-stereo-block-matching-with-calibrated-cameras)
+
 ## 実行モジュール
 
 1. StereoBlockMatch - カメラ2台のステレオマッチング結果をリアルタイム表示
